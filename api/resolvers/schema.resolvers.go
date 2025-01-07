@@ -11,7 +11,7 @@ import (
 )
 
 // Parrot is the resolver for the parrot field.
-func (r *queryResolver) Parrot(ctx context.Context, input any) (*models.Result, error) {
+func (r *queryResolver) Parrot(ctx context.Context, input interface{}) (*models.Result, error) {
 	return &models.Result{Value: input}, nil
 }
 

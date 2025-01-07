@@ -18,3 +18,8 @@ resolver:
   dir: api/resolvers
   filename: api/resolvers/resolver_gen.go
   package: resolvers
+
+models:
+  Any:
+    model:
+      - gqlgen-test/models.Any

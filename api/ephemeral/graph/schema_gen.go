@@ -46,7 +46,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Query struct {
-		Parrot func(childComplexity int, input any) int
+		Parrot func(childComplexity int, input interface{}) int
 	}
 
 	Result struct {
@@ -55,7 +55,7 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
-	Parrot(ctx context.Context, input any) (*models.Result, error)
+	Parrot(ctx context.Context, input interface{}) (*models.Result, error)
 }
 
 type executableSchema struct {
@@ -87,7 +87,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Parrot(childComplexity, args["input"].(any)), true
+		return e.complexity.Query.Parrot(childComplexity, args["input"].(interface{})), true
 
 	case "Result.value":
 		if e.complexity.Result.Value == nil {
@@ -187,7 +187,6 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var sources = []*ast.Source{
 	{Name: "../../schema/schema.graphql", Input: `scalar Any
 
-
 directive @goModel(
 	model: String
 	models: [String!]
@@ -250,9 +249,9 @@ func (ec *executionContext) field_Query_parrot_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_parrot_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (any, error) {
+) (interface{}, error) {
 	if _, ok := rawArgs["input"]; !ok {
-		var zeroVal any
+		var zeroVal interface{}
 		return zeroVal, nil
 	}
 
@@ -261,7 +260,7 @@ func (ec *executionContext) field_Query_parrot_argsInput(
 		return ec.unmarshalNAny2interface(ctx, tmp)
 	}
 
-	var zeroVal any
+	var zeroVal interface{}
 	return zeroVal, nil
 }
 
@@ -2786,7 +2785,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // region    ***************************** type.gotpl *****************************
 
 func (ec *executionContext) unmarshalNAny2interface(ctx context.Context, v any) (interface{}, error) {
-	res, err := graphql.UnmarshalAny(v)
+	res, err := models.UnmarshalAny(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -2797,7 +2796,7 @@ func (ec *executionContext) marshalNAny2interface(ctx context.Context, sel ast.S
 		}
 		return graphql.Null
 	}
-	res := graphql.MarshalAny(v)
+	res := models.MarshalAny(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")

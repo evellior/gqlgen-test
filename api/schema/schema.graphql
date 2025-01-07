@@ -1,6 +1,5 @@
 scalar Any
 
-
 directive @goModel(
 	model: String
 	models: [String!]
