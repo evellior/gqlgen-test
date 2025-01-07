@@ -1,5 +1,16 @@
 scalar Any
 
+
+directive @goModel(
+	model: String
+	models: [String!]
+	forceGenerate: Boolean
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+
+type Result @goModel(model: "gqlgen-test/models.Result") {
+    value: Any
+}
+
 type Query {
-    parrot(input: Any!): Any!
+    parrot(input: Any!): Result!
 }

@@ -7,11 +7,12 @@ package resolvers
 import (
 	"context"
 	"gqlgen-test/api/ephemeral/graph"
+	"gqlgen-test/models"
 )
 
 // Parrot is the resolver for the parrot field.
-func (r *queryResolver) Parrot(ctx context.Context, input any) (any, error) {
-	return input, nil
+func (r *queryResolver) Parrot(ctx context.Context, input any) (*models.Result, error) {
+	return &models.Result{Value: input}, nil
 }
 
 // Query returns graph.QueryResolver implementation.
