@@ -1,0 +1,5 @@
+scalar Any
+
+type Query {
+    parrot(input: Any!): Any!
+}
