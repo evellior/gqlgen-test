@@ -195,7 +195,7 @@ directive @goModel(
 ) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 
 type Result @goModel(model: "gqlgen-test/models.Result") {
-    value: Any
+    value: Any!
 }
 
 type Query {
@@ -544,11 +544,14 @@ func (ec *executionContext) _Result_value(ctx context.Context, field graphql.Col
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(interface{})
 	fc.Result = res
-	return ec.marshalOAny2interface(ctx, field.Selections, res)
+	return ec.marshalNAny2interface(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Result_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2430,6 +2433,9 @@ func (ec *executionContext) _Result(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = graphql.MarshalString("Result")
 		case "value":
 			out.Values[i] = ec._Result_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3094,22 +3100,6 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 	}
-	return res
-}
-
-func (ec *executionContext) unmarshalOAny2interface(ctx context.Context, v any) (interface{}, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalAny(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOAny2interface(ctx context.Context, sel ast.SelectionSet, v interface{}) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalAny(v)
 	return res
 }
 
